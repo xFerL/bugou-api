@@ -3,6 +3,7 @@ package com.bugou.service;
 import com.bugou.entity.ErrorKnowledge;
 import com.bugou.repository.ErrorKnowledgeRepository;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class ErrorKnowledgeService {
@@ -15,5 +16,9 @@ public class ErrorKnowledgeService {
 
     public ErrorKnowledge salvar(ErrorKnowledge errorKnowledge) {
         return repository.save(errorKnowledge);
+    }
+
+    public List<ErrorKnowledge> buscarTodos() {
+        return repository.findAll();
     }
 }
