@@ -16,17 +16,5 @@ Transformar mensagens de erro técnicas em explicações claras, causas prováve
 * Validation
 * Maven
 
-## Roadmap
-
-* [x] Inicialização do projeto
-* [ ] Cadastro de erros
-* [ ] Consulta por código
-* [ ] Consulta por mensagem
-* [ ] Estatísticas
-* [ ] PostgreSQL
-* [ ] Docker
-* [ ] Testes automatizados
-* [ ] GitHub Actions
-
-
+---
 * Aceito contribuições. API feita de DEV para DEV.
