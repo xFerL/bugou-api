@@ -10,13 +10,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-
 public class ErrorKnowledge {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String code;
+
     private String title;
+
     private String category;
+
     private String explanation;
 }

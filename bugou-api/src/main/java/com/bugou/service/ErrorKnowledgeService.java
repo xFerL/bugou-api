@@ -1,10 +1,10 @@
 package com.bugou.service;
 
 import com.bugou.entity.ErrorKnowledge;
+import com.bugou.exception.ResourceNotFoundException;
 import com.bugou.repository.ErrorKnowledgeRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ErrorKnowledgeService {
@@ -23,11 +23,21 @@ public class ErrorKnowledgeService {
         return repository.findAll();
     }
 
-    public Optional<ErrorKnowledge> buscarPorId(Long id) {
-        return  repository.findById(id);
+    public ErrorKnowledge buscarPorId(Long id) {
+
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Error not found with id: " + id
+                        ));
     }
 
-    public Optional<ErrorKnowledge> buscarPorTitulo(String title) {
-        return repository.findByTitle(title);
+    public ErrorKnowledge buscarPorTitulo(String title) {
+
+        return repository.findByTitle(title)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Error not found with title: " + title
+                        ));
     }
 }

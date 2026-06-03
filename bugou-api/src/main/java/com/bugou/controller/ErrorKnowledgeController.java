@@ -1,14 +1,19 @@
 package com.bugou.controller;
 
+import com.bugou.dto.ErrorKnowledgeRequest;
+import com.bugou.dto.ErrorKnowledgeResponse;
 import com.bugou.entity.ErrorKnowledge;
 import com.bugou.service.ErrorKnowledgeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import java.util.Optional;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 
+@Tag(name = "Error Knowledge", description = "Gerenciamento de erros de programação")
 @RestController
 @RequestMapping("/api/v1/errors")
 public class ErrorKnowledgeController {
@@ -18,44 +23,74 @@ public class ErrorKnowledgeController {
     public ErrorKnowledgeController(ErrorKnowledgeService service) {
         this.service = service;
     }
-
+    @Operation(summary = "Criar um novo erro")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ErrorKnowledge criar(@RequestBody ErrorKnowledge errorKnowledge) {
-        return service.salvar(errorKnowledge);
-    }
+    public ErrorKnowledgeResponse criar(
+            @Valid @RequestBody ErrorKnowledgeRequest request) {
 
+        ErrorKnowledge errorKnowledge = new ErrorKnowledge();
+
+        errorKnowledge.setCode(request.code());
+        errorKnowledge.setTitle(request.title());
+        errorKnowledge.setCategory(request.category());
+        errorKnowledge.setExplanation(request.explanation());
+
+        ErrorKnowledge saved = service.salvar(errorKnowledge);
+
+        return new ErrorKnowledgeResponse(
+                saved.getId(),
+                saved.getCode(),
+                saved.getTitle(),
+                saved.getCategory(),
+                saved.getExplanation()
+        );
+    }
+    @Operation(summary = "Listar todos os erros")
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<ErrorKnowledge> buscarTodos() {
-        return service.buscarTodos();
+    public List<ErrorKnowledgeResponse> buscarTodos() {
+
+        return service.buscarTodos()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
+    @Operation(summary = "Buscar erro por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ErrorKnowledge> buscarPorId(
+    public ResponseEntity<ErrorKnowledgeResponse> buscarPorId(
             @PathVariable Long id) {
 
-        Optional<ErrorKnowledge> errorKnowledge =
+        ErrorKnowledge errorKnowledge =
                 service.buscarPorId(id);
 
-        if (errorKnowledge.isPresent()) {
-            return ResponseEntity.ok(errorKnowledge.get());
-        }
-
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                toResponse(errorKnowledge)
+        );
     }
 
+    @Operation(summary = "Buscar erro por título")
     @GetMapping("/search")
-    public ResponseEntity<ErrorKnowledge> buscarPorTitulo(
+    public ResponseEntity<ErrorKnowledgeResponse> buscarPorTitulo(
             @RequestParam String title) {
 
-        Optional<ErrorKnowledge> errorKnowledge =
+        ErrorKnowledge errorKnowledge =
                 service.buscarPorTitulo(title);
 
-        if (errorKnowledge.isPresent()) {
-            return ResponseEntity.ok(errorKnowledge.get());
-        }
+        return ResponseEntity.ok(
+                toResponse(errorKnowledge)
+        );
+    }
 
-        return ResponseEntity.notFound().build();
+    private ErrorKnowledgeResponse toResponse(
+            ErrorKnowledge errorKnowledge) {
+
+        return new ErrorKnowledgeResponse(
+                errorKnowledge.getId(),
+                errorKnowledge.getCode(),
+                errorKnowledge.getTitle(),
+                errorKnowledge.getCategory(),
+                errorKnowledge.getExplanation()
+        );
     }
 }
