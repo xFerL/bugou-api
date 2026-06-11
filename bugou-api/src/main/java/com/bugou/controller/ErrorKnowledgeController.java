@@ -4,16 +4,23 @@ import com.bugou.dto.ErrorKnowledgeRequest;
 import com.bugou.dto.ErrorKnowledgeResponse;
 import com.bugou.entity.ErrorKnowledge;
 import com.bugou.service.ErrorKnowledgeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
-import jakarta.validation.Valid;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Operation;
+import com.bugou.dto.ErrorResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "Error Knowledge", description = "Gerenciamento de erros de programação")
+@Tag(
+        name = "Error Knowledge",
+        description = "Gerenciamento de erros de programação"
+)
 @RestController
 @RequestMapping("/api/v1/errors")
 public class ErrorKnowledgeController {
@@ -23,7 +30,26 @@ public class ErrorKnowledgeController {
     public ErrorKnowledgeController(ErrorKnowledgeService service) {
         this.service = service;
     }
-    @Operation(summary = "Criar um novo erro")
+
+    @Operation(
+            summary = "Criar um novo erro",
+            description = "Registra um novo erro na base de conhecimento"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Erro criado com sucesso"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos",
+                    content = @Content(
+                            schema = @Schema(
+                                    implementation = ErrorResponse.class
+                            )
+                    )
+            )
+    })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ErrorKnowledgeResponse criar(
@@ -46,7 +72,15 @@ public class ErrorKnowledgeController {
                 saved.getExplanation()
         );
     }
-    @Operation(summary = "Listar todos os erros")
+
+    @Operation(
+            summary = "Listar todos os erros",
+            description = "Retorna todos os erros cadastrados"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Lista retornada com sucesso"
+    )
     @GetMapping
     public List<ErrorKnowledgeResponse> buscarTodos() {
 
@@ -56,7 +90,25 @@ public class ErrorKnowledgeController {
                 .toList();
     }
 
-    @Operation(summary = "Buscar erro por ID")
+    @Operation(
+            summary = "Buscar erro por ID",
+            description = "Retorna um erro utilizando seu identificador"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Erro encontrado"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Erro não encontrado",
+                    content = @Content(
+                            schema = @Schema(
+                                    implementation = ErrorResponse.class
+                            )
+                    )
+            )
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ErrorKnowledgeResponse> buscarPorId(
             @PathVariable Long id) {
@@ -69,7 +121,25 @@ public class ErrorKnowledgeController {
         );
     }
 
-    @Operation(summary = "Buscar erro por título")
+    @Operation(
+            summary = "Buscar erro por título",
+            description = "Retorna um erro utilizando seu título"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Erro encontrado"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Erro não encontrado",
+                    content = @Content(
+                            schema = @Schema(
+                                    implementation = ErrorResponse.class
+                            )
+                    )
+            )
+    })
     @GetMapping("/search")
     public ResponseEntity<ErrorKnowledgeResponse> buscarPorTitulo(
             @RequestParam String title) {
